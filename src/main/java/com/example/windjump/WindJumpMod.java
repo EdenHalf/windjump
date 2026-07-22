@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -20,38 +21,43 @@ import org.lwjgl.glfw.GLFW;
 public class WindJumpMod {
     public static final String MODID = "windjump";
 
-    // KeyMapping definition using standard vanilla constructor for maximum compatibility
+    // 1. Create a Category object using your mod's namespace
+    public static final KeyMapping.Category WIND_JUMP_CATEGORY = new KeyMapping.Category(
+            ResourceLocation.fromNamespaceAndPath("windjump", "category")
+    );
+
+    // 2. Define the KeyMapping using the Category object and map to 'C'
     public static final KeyMapping WIND_JUMP_KEY = new KeyMapping(
             "key.windjump.jump",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_C,
-            "key.categories.movement"
+            WIND_JUMP_CATEGORY
     );
 
     @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
     public static class ClientEvents {
 
-        // Register key mapping (NeoForge automatically routes IModBusEvents here)
+        // Register the key mapping
         @SubscribeEvent
         public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
             event.register(WIND_JUMP_KEY);
         }
 
-        // Tick loop (NeoForge automatically routes game tick events here)
+        // Handle the game tick to detect the button press
         @SubscribeEvent
         public static void onClientTick(ClientTickEvent.Post event) {
             Minecraft mc = Minecraft.getInstance();
             Player player = mc.player;
 
             if (player != null && WIND_JUMP_KEY.consumeClick()) {
-                // Apply upward jump velocity
+                // Launch player upwards
                 Vec3 currentVel = player.getDeltaMovement();
                 player.setDeltaMovement(currentVel.x, 1.25D, currentVel.z);
 
-                // Reset fall distance on client side
+                // Protect against fall damage
                 player.resetFallDistance();
 
-                // Spawn wind particles and play sound locally
+                // Visual and audio effects
                 if (mc.level != null) {
                     mc.level.addParticle(
                             ParticleTypes.GUST,
