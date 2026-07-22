@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -21,9 +21,9 @@ import org.lwjgl.glfw.GLFW;
 public class WindJumpMod {
     public static final String MODID = "windjump";
 
-    // 1. Create a Category object using your mod's namespace
+    // 1. Create a Category object using the new Identifier system
     public static final KeyMapping.Category WIND_JUMP_CATEGORY = new KeyMapping.Category(
-            ResourceLocation.fromNamespaceAndPath("windjump", "category")
+            Identifier.fromNamespaceAndPath("windjump", "category")
     );
 
     // 2. Define the KeyMapping using the Category object and map to 'C'
@@ -37,9 +37,10 @@ public class WindJumpMod {
     @EventBusSubscriber(modid = MODID, value = Dist.CLIENT)
     public static class ClientEvents {
 
-        // Register the key mapping
+        // Register the category and the key mapping
         @SubscribeEvent
         public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+            event.registerCategory(WIND_JUMP_CATEGORY);
             event.register(WIND_JUMP_KEY);
         }
 
