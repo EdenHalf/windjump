@@ -21,7 +21,6 @@ import org.lwjgl.glfw.GLFW;
 public class WindJumpMod {
     public static final String MODID = "windjump";
 
-    // Keymapping for pressing "C" in-game
     public static final KeyMapping WIND_JUMP_KEY = new KeyMapping(
             "key.windjump.jump",
             KeyConflictContext.IN_GAME,
@@ -45,25 +44,24 @@ public class WindJumpMod {
             Minecraft mc = Minecraft.getInstance();
             Player player = mc.player;
 
-            // Check if player pressed "C" and is active
             if (player != null && WIND_JUMP_KEY.consumeClick()) {
-                // Launch the player upwards like a Wind Charge
+                // Velocity thrust upwards
                 Vec3 currentVel = player.getDeltaMovement();
-                player.setDeltaMovement(currentVel.x, 1.2D, currentVel.z);
+                player.setDeltaMovement(currentVel.x, 1.25D, currentVel.z);
                 player.hasImpulse = true;
 
-                // Protect player from Fall and Kinetic Collision damage on landing
+                // Reset fall distance counter to avoid fall damage
                 player.resetFallDistance();
 
-                // Spawn Wind Charge particles
                 if (mc.level != null) {
+                    // Spawn particles
                     mc.level.addParticle(
                             ParticleTypes.GUST_EMITTER,
                             player.getX(), player.getY(), player.getZ(),
                             0.0D, 0.0D, 0.0D
                     );
 
-                    // Play Wind Charge Burst Sound
+                    // Play sound
                     mc.level.playLocalSound(
                             player.getX(), player.getY(), player.getZ(),
                             SoundEvents.WIND_CHARGE_BURST,
